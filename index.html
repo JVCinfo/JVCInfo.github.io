@@ -228,26 +228,98 @@
         
         .video-badge {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            background: linear-gradient(135deg, #007bff, #6f42c1);
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24, #ff4757);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-            animation: pulse 2s infinite;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 
+                0 8px 32px rgba(255, 107, 107, 0.4),
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            animation: videoBadgePulse 3s ease-in-out infinite;
+            z-index: 10;
+            position: absolute;
+            overflow: hidden;
         }
         
-        @keyframes pulse {
+        .video-badge::before {
+            content: '▶';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            animation: playIcon 2s ease-in-out infinite;
+        }
+        
+        .video-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24, #ff4757, #ff6b6b);
+            border-radius: 50px;
+            z-index: -1;
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+        
+        .video-badge:hover {
+            transform: translateX(-50%) scale(1.05) rotate(1deg);
+            box-shadow: 
+                0 12px 40px rgba(255, 107, 107, 0.6),
+                0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes videoBadgePulse {
             0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+                transform: translateX(-50%) scale(1);
+                box-shadow: 
+                    0 8px 32px rgba(255, 107, 107, 0.4),
+                    0 4px 16px rgba(0, 0, 0, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2);
             }
             50% {
-                transform: scale(1.05);
-                box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+                transform: translateX(-50%) scale(1.03);
+                box-shadow: 
+                    0 12px 40px rgba(255, 107, 107, 0.6),
+                    0 6px 20px rgba(0, 0, 0, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            }
+        }
+        
+        @keyframes playIcon {
+            0%, 100% {
+                transform: translateY(-50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
             }
         }
         
@@ -493,7 +565,6 @@
                     日本発のオンライン国際教育プラットフォームとしての取り組みをご覧ください。
                 </p>
                 <div class="video-wrapper">
-                    <div class="video-badge">公式動画</div>
                     <div class="video-frame">
                         <iframe 
                             src="https://www.youtube.com/embed/t5KjWBJcDZg?si=Fxi6u6T7Bf9Eu7U_" 
