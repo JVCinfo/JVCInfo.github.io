@@ -1,1 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talk in Japan: インタラクティブ学習ガイド</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals (Cream, Dark Slate, Muted Blue) -->
+    <!-- Application Structure Plan: A single-page application with a sticky navigation bar that allows users to jump between different learning modules (Foundations, Conversation, Advanced, Business). This tab-based structure provides a clear, guided learning path. Each module's content, including objectives, video playlists, and skill breakdowns, is loaded dynamically into the main content area. This approach was chosen to prevent overwhelming the user with information and to create an organized, course-like experience that is easy to navigate on both desktop and mobile devices. -->
+    <!-- Visualization & Content Choices: Report Info: Module Skill Focus -> Goal: Inform/Compare -> Viz: Donut Chart (Chart.js/Canvas) to show the proportional focus of skills within each module. Interaction: Tooltips on hover. Justification: A donut chart provides an immediate, easy-to-understand visual summary of the learning priorities for each level. Report Info: Curriculum Maps/Skill Matrices -> Goal: Organize/Inform -> Viz: Interactive Accordion (HTML/CSS/JS) to present detailed tasks. Interaction: Click to expand/collapse. Justification: Accordions are more mobile-friendly and less cluttered than large tables, allowing learners to focus on one task at a time. NO SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #FDFBF6;
+            color: #333D45;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #60A5FA;
+            color: #2563EB;
+            font-weight: 700;
+        }
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .accordion-item.open .accordion-content {
+            max-height: 1000px; /* Adjust as needed */
+        }
+        .accordion-item.open .accordion-arrow {
+            transform: rotate(180deg);
+        }
+        .accordion-arrow {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center my-8 md:my-12">
+            <h1 class="text-4xl md:text-5xl font-black text-[#2c3e50] mb-3">Talk in Japan: インタラクティブ学習ガイド</h1>
+            <p class="text-lg md:text-xl text-gray-600">プロが設計したYouTube学習エコシステムを最大限に活用する</p>
+        </header>
+
+        <section id="intro" class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#34495e] mb-4 text-center">なぜ「Talk in Japan」で学ぶのか？</h2>
+            <div class="grid md:grid-cols-2 gap-6 items-center">
+                <div>
+                    <p class="text-gray-700 leading-relaxed mb-4">このチャンネルは単なる動画集ではありません。日本語教育の専門企業<strong class="text-[#2980b9]">アテイン株式会社</strong>が運営する、体系的な学習エコシステムです。有料コースへの入り口として機能するため、無料コンテンツも非常に高品質で、信頼性の高いカリキュラムに基づいています。</p>
+                    <p class="text-gray-700 leading-relaxed">初期の講義形式の動画から、近年のインタラクティブなライブ配信まで、コンテンツは学習者の成長に合わせて進化しています。このガイドは、その豊富なリソースをレベル別にナビゲートし、あなたの日本語学習を加速させます。</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-[#eaf2f8] p-4 rounded-lg text-center">
+                        <div class="text-4xl mb-2">🎓</div>
+                        <h3 class="font-bold text-[#2c3e50]">専門的な裏付け</h3>
+                        <p class="text-sm text-gray-600">教育のプロによる信頼性の高いコンテンツ</p>
+                    </div>
+                    <div class="bg-[#eaf2f8] p-4 rounded-lg text-center">
+                        <div class="text-4xl mb-2">📚</div>
+                        <h3 class="font-bold text-[#2c3e50]">広範なカバレッジ</h3>
+                        <p class="text-sm text-gray-600">N5からN1、ビジネス日本語まで1,400本以上</p>
+                    </div>
+                    <div class="bg-[#eaf2f8] p-4 rounded-lg text-center">
+                        <div class="text-4xl mb-2">💬</div>
+                        <h3 class="font-bold text-[#2c3e50]">多様なフォーマット</h3>
+                        <p class="text-sm text-gray-600">レッスン、ライブ配信、文化体験ツアー</p>
+                    </div>
+                     <div class="bg-[#fdedec] p-4 rounded-lg text-center">
+                        <div class="text-4xl mb-2">⚠️</div>
+                        <h3 class="font-bold text-[#c0392b]">留意点</h3>
+                        <p class="text-sm text-gray-600">古い動画の音質やリンク切れの可能性</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <nav id="module-nav" class="sticky top-0 bg-[#FDFBF6] z-10 shadow-md rounded-lg mb-8 py-2 px-4">
+            <ul class="flex flex-wrap justify-center items-center gap-x-4 md:gap-x-8">
+                <li><button data-module="module1" class="nav-link p-3 text-gray-600 hover:text-[#2980b9] active">基礎固め (N5-N4)</button></li>
+                <li><button data-module="module2" class="nav-link p-3 text-gray-600 hover:text-[#2980b9]">会話力向上 (N3-N2)</button></li>
+                <li><button data-module="module3" class="nav-link p-3 text-gray-600 hover:text-[#2980b9]">高度な習熟 (N1+)</button></li>
+                <li><button data-module="module-business" class="nav-link p-3 text-gray-600 hover:text-[#2980b9]">ビジネス日本語</button></li>
+            </ul>
+        </nav>
+
+        <main id="content-area">
+            <!-- Module content will be injected here by JavaScript -->
+        </main>
+        
+        <footer class="text-center mt-12 pt-8 border-t border-gray-200">
+             <p class="text-gray-600">学習の準備はできましたか？ <a href="https://www.youtube.com/@talkinjapan" target="_blank" class="font-bold text-[#2980b9] hover:underline">「Talk in Japan」チャンネル</a>で今日から始めましょう。</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const appData = {
+            module1: {
+                title: "モジュール1: 日本語の基礎固め (JLPT N5-N4レベル)",
+                description: "日本語学習をゼロから始める初心者を対象とし、基本的なコミュニケーションに不可欠な文字、語彙、文法構造の習得を目指します。構造化された指導コンテンツを中心に学習を進めます。",
+                chartData: {
+                    labels: ['文字 (かな)', '基本語彙・フレーズ', '漢字・基本文法'],
+                    data: [40, 35, 25],
+                    colors: ['#3498db', '#9b59b6', '#f1c40f']
+                },
+                units: [
+                    {
+                        title: "Unit 1.1: 日本語の文字システム – ひらがな & カタカナ",
+                        objective: "46の基本的なひらがなとカタカナの読み書き、発音を完全にマスターする。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong> 2つの包括的な再生リストを軸に進めます。</p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIe0rzFCzxBdwL3f_FbNvoaz" target="_blank" class="text-blue-600 hover:underline">再生リスト: ひらがな学習</a></li>
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIebMOb6lD2-788sEom7fiQI" target="_blank" class="text-blue-600 hover:underline">再生リスト: カタカナ学習</a></li>
+                            </ul>
+                            <p class="mt-4"><strong>推奨活動:</strong> 各動画を1日のレッスンと位置づけ、視聴、筆記練習、単語のフラッシュカード作成を日課とします。</p>
+                        `
+                    },
+                    {
+                        title: "Unit 1.2: 基本語彙と必須フレーズ",
+                        objective: "約500〜800語の基礎語彙と日常的な挨拶をマスターする。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/c/TalkInJapan/playlists" target="_blank" class="text-blue-600 hover:underline">再生リスト: 『生活者としての日本語』</a>から実用的な場面の動画を視聴。</li>
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIfVXkm0zvbID6X0Be1QjdKb" target="_blank" class="text-blue-600 hover:underline">再生リスト: ビジネスコース初級編</a>から普遍的な挨拶を学ぶ。</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Unit 1.3: 漢字と基本文法の導入",
+                        objective: "約100〜150の基本漢字と、助詞や動詞活用などの基本文法を理解する。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=3t8HCUTP7Go" target="_blank" class="text-blue-600 hover:underline">動画: JLPT N4 漢字</a>をセグメントに分けて学習。</li>
+                                <li><a href="https://www.youtube.com/c/TalkInJapan/playlists" target="_blank" class="text-blue-600 hover:underline">再生リスト: JLPT N4 文法</a>で文の構造を分析。</li>
+                            </ul>
+                        `
+                    }
+                ]
+            },
+            module2: {
+                title: "モジュール2: 会話能力の向上 (JLPT N3-N2レベル)",
+                description: "基礎をマスターし、より自然で表現力豊かな日本語を目指します。学習の焦点を暗記からニュアンスや文脈の理解へと移行させ、ライブストリームコンテンツを主軸に据えます。",
+                chartData: {
+                    labels: ['表現力の拡張', 'リスニング実践', '会話の技術 (相槌)'],
+                    data: [40, 35, 25],
+                    colors: ['#2ecc71', '#e67e22', '#1abc9c']
+                },
+                units: [
+                    {
+                        title: "Unit 2.1: 表現力の拡張",
+                        objective: "感情、食感、音などを表現するためのテーマ別語彙を習得する。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=8hGhoqogxKs" target="_blank" class="text-blue-600 hover:underline">動画: 日本のオノマトペ</a></li>
+                                <li><a href="https://www.youtube.com/watch?v=_CqcNbymRG0" target="_blank" class="text-blue-600 hover:underline">ライブQ&A: 食べ物の表現</a></li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Unit 2.2: 自然な会話の流れの技術 – 相槌",
+                        objective: "会話のリズムを維持するため、様々な形の「相槌」を理解し、適切に使えるようになる。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=qIjQLyzf9Pg" target="_blank" class="text-blue-600 hover:underline">ライブストリーム: 相槌の深掘り</a></li>
+                            </ul>
+                            <p class="mt-4"><strong>ポイント:</strong> 相槌は単なる語彙ではなく、日本のコミュニケーション文化を理解する鍵です。相手への敬意と傾聴の姿勢を示します。</p>
+                        `
+                    },
+                    {
+                        title: "Unit 2.3: 実践的なリスニング – ライブウォーキングツアー",
+                        objective: "現実の環境で話される、自然なスピードの日本語に対するリスニング能力を向上させる。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=sGQwh5EGjhM" target="_blank" class="text-blue-600 hover:underline">動画: 横浜ライブウォーキングツアー</a></li>
+                            </ul>
+                            <p class="mt-4"><strong>推奨活動:</strong> 1回目は字幕なしで、2回目は文字情報を読み取り、3回目はシャドーイングを行う多段階アプローチが効果的です。</p>
+                        `
+                    }
+                ]
+            },
+            module3: {
+                title: "モジュール3: 高度な習熟度を目指す (JLPT N1以上)",
+                description: "複雑なトピックを理解し、ニュアンスに富んだ議論に参加できる高いレベルの日本語能力を目指します。チャンネル内で提供される最も高度なレッスンを活用します。",
+                chartData: {
+                    labels: ['上級文法・ニュアンス', '高度な談話・会話練習'],
+                    data: [60, 40],
+                    colors: ['#e74c3c', '#8e44ad']
+                },
+                units: [
+                    {
+                        title: "Unit 3.1: 上級文法とニュアンスの習得",
+                        objective: "JLPT N1レベルで求められる複雑な文法構造、接続詞、文型を理解し、適切に使用する。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=MmpCoO3IsAE" target="_blank" class="text-blue-600 hover:underline">動画: 上級日本語N1文法練習</a></li>
+                                <li><a href="https://www.youtube.com/@learnjapanese81" target="_blank" class="text-blue-600 hover:underline">チャンネル: 上級者向け教材</a></li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Unit 3.2: 高度な談話と会話練習",
+                        objective: "抽象的または専門的なトピックに関する会話を追い、論理的な流れと洗練された語彙を用いて議論に参加する。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/watch?v=MmpCoO3IsAE" target="_blank" class="text-blue-600 hover:underline">動画: 上級会話練習</a></li>
+                            </ul>
+                            <p class="mt-4"><strong>発展的学習:</strong> 中級レベルのライブストリームを再視聴し、議論の構築方法や意見の表明の仕方など、談話構造に注目して分析します。</p>
+                        `
+                    }
+                ]
+            },
+            'module-business': {
+                title: "特別カリキュラム: プロフェッショナルコミュニケーションとビジネス日本語",
+                description: "ビジネスの現場で日本語を使用する必要がある中級以上の学習者向けに設計された「コース内コース」。単なる言語だけでなく、日本の企業文化への実践的な訓練プログラムです。",
+                chartData: {
+                    labels: ['ビジネスマナー・敬語', 'オフィスでの振る舞い', '実践的コミュニケーション'],
+                    data: [45, 35, 20],
+                    colors: ['#34495e', '#7f8c8d', '#bdc3c7']
+                },
+                units: [
+                    {
+                        title: "Unit 5.1: ビジネスエチケットの基礎",
+                        objective: "適切な身だしなみの重要性を理解し、基本的なビジネス挨拶をマスターする。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIfVXkm0zvbID6X0Be1QjdKb" target="_blank" class="text-blue-600 hover:underline">再生リスト: ビジネス日本語</a>内の「服装」「挨拶」に関する動画</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Unit 5.2: オフィス環境での立ち居振る舞い",
+                        objective: "会議、来客応対、社内コミュニケーションにおける正しい手順と言葉遣いを学ぶ。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIfVXkm0zvbID6X0Be1QjdKb" target="_blank" class="text-blue-600 hover:underline">再生リスト: ビジネス日本語</a>内の「応接室での振る舞い」「会議のポイント」に関する動画</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        title: "Unit 5.3: 実践的なビジネス日本語コミュニケーション",
+                        objective: "場所を尋ねたり説明したりするなど、一般的なビジネスシーンで言語スキルを応用する。",
+                        content: `
+                            <p class="mb-2"><strong>主要コンテンツ:</strong></p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><a href="https://www.youtube.com/playlist?list=PL8dhMOKO4oIfVXkm0zvbID6X0Be1QjdKb" target="_blank" class="text-blue-600 hover:underline">再生リスト: ビジネス日本語</a>内の「会社はどこにありますか」などの応用動画</li>
+                            </ul>
+                        `
+                    }
+                ]
+            }
+        };
+
+        const contentArea = document.getElementById('content-area');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let currentChart = null;
+
+        function renderModule(moduleId) {
+            const moduleData = appData[moduleId];
+            if (!moduleData) return;
+
+            const unitsHtml = moduleData.units.map(unit => `
+                <div class="accordion-item bg-white border border-gray-200 rounded-lg mb-4">
+                    <div class="accordion-header flex justify-between items-center p-4 hover:bg-gray-50">
+                        <h4 class="text-lg font-bold text-[#2c3e50]">${unit.title}</h4>
+                        <div class="accordion-arrow text-2xl text-gray-400">▼</div>
+                    </div>
+                    <div class="accordion-content p-4 border-t border-gray-200">
+                        <p class="font-semibold text-gray-700 mb-3">学習目標: ${unit.objective}</p>
+                        ${unit.content}
+                    </div>
+                </div>
+            `).join('');
+
+            contentArea.innerHTML = `
+                <section id="${moduleId}" class="module-content bg-white/50 rounded-xl shadow-lg p-6 md:p-8">
+                    <h2 class="text-3xl font-bold text-center text-[#34495e] mb-4">${moduleData.title}</h2>
+                    <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">${moduleData.description}</p>
+                    
+                    <div class="grid md:grid-cols-5 gap-8 items-center">
+                        <div class="md:col-span-2">
+                            <h3 class="text-xl font-bold text-center text-[#2c3e50] mb-4">スキル焦点の内訳</h3>
+                            <div class="chart-container">
+                                <canvas id="moduleChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="md:col-span-3">
+                            ${unitsHtml}
+                        </div>
+                    </div>
+                </section>
+            `;
+
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const ctx = document.getElementById('moduleChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: moduleData.chartData.labels,
+                    datasets: [{
+                        data: moduleData.chartData.data,
+                        backgroundColor: moduleData.chartData.colors,
+                        borderColor: '#FDFBF6',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            setupAccordions();
+        }
+        
+        function setupAccordions() {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    accordionItems.forEach(i => i.classList.remove('open'));
+                    if (!isOpen) {
+                        item.classList.add('open');
+                    }
+                });
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const moduleId = e.target.dataset.module;
+                
+                navLinks.forEach(l => l.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                renderModule(moduleId);
+            });
+        });
+
+        // Initial render
+        renderModule('module1');
+    </script>
+</body>
+</html>
 
